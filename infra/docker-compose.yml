@@ -20,10 +20,11 @@ services:
   
   frontend:
     build:
-      context: ../frontend
-      dockerfile: Dockerfile
+      image: genpoplevin/foodgram_frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
+    depends_on:
+      - backend
   nginx:
     image: nginx:1.19.3
     ports:
