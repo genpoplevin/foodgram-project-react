@@ -8,7 +8,7 @@ services:
       - ./.env
   
   backend:
-    image: genpoplevin/foodgram_backend:latest
+    image: genpoplevin/foodgram_backend
     restart: always
     volumes:
       - static_value:/app/static/
@@ -19,7 +19,7 @@ services:
       - ./.env
   
   frontend:
-    image: genpoplevin/foodgram_frontend:latest
+    image: genpoplevin/foodgram_frontend
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
