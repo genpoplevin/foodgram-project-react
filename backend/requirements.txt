@@ -3,6 +3,7 @@ djangorestframework==3.12.4
 djangorestframework-simplejwt==4.7.2
 djoser
 drf_extra_fields
+gunicorn
 Pillow
 psycopg2-binary==2.8.6
 python-dotenv
