@@ -58,7 +58,7 @@ jobs:
           script: |
             sudo docker-compose stop 
             sudo docker-compose rm backend
-            docker rm -f $(docker ps -aq)
+            sudo docker rm -f $(docker ps -aq)
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_backend 
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend
             rm .env
