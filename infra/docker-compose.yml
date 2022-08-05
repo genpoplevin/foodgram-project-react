@@ -20,6 +20,7 @@ services:
   
   frontend:
     image: genpoplevin/foodgram_frontend
+    restart: always
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
