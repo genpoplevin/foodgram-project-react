@@ -49,7 +49,7 @@ class IngredientsInRecipeSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
-    tags = TagSerializer(read_only=True, many=True)
+    tags = TagSerializer(many=True)
     author = UserSerializer(read_only=True)
     ingredients = IngredientsInRecipeSerializer(
         source='ingredientsinrecipe_set',
