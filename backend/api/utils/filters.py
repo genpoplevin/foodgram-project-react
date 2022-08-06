@@ -1,4 +1,5 @@
-from django_filters.rest_framework import CharFilter, FilterSet
+from django_filters.rest_framework import (CharFilter, FilterSet,
+                                           ModelMultipleChoiceFilter)
 from recipes.models import Ingredient, Recipe, Tag
 from users.models import User
 
@@ -12,7 +13,7 @@ class IngredientFilter(FilterSet):
 
 
 class TagFilter(FilterSet):
-    tags = filter.ModelMultipleChoiceFilter(
+    tags = ModelMultipleChoiceFilter(
         field_name='tags__slug',
         to_field_name='slug',
         queryset=Tag.objects.all()
