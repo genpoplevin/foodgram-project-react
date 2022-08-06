@@ -78,7 +78,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         return Recipe.objects.filter(
             shopping_cart__user=user,
             id=obj.id
-        ).exists()
+        )
 
     def validate(self, data):
         ingredients = self.initial_data.get('ingredients')
