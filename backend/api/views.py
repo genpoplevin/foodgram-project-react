@@ -1,9 +1,6 @@
-from api.serializers import (FavoriteCartSerializer, IngredientSerializer,
-                             RecipeSerializer, SubscribeSerializer,
-                             TagSerializer, UserSerializer)
-from api.utils.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
 from recipes.models import (Favorite, Ingredient, IngredientsInRecipe, Recipe,
                             ShoppingCart, Tag)
@@ -12,6 +9,11 @@ from rest_framework.decorators import action
 from rest_framework.permissions import (AllowAny, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
+from api.serializers import (FavoriteCartSerializer, IngredientSerializer,
+                             RecipeSerializer, SubscribeSerializer,
+                             TagSerializer, UserSerializer)
+from api.utils.filters import IngredientFilter, TagFilter
+from api.utils.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from users.models import Subscribe, User
 
 
@@ -79,6 +81,8 @@ class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = IngredientFilter
     pagination_class = None
 
 
@@ -87,6 +91,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
     additional_serializer = FavoriteCartSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TagFilter
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
