@@ -30,11 +30,13 @@ class TagFilter(FilterSet):
         fields = ('tags', 'author', 'is_favorited', 'is_in_shopping_cart')
 
     def get_is_favorited(self, queryset, name, value):
-        if value:
-            return queryset.filter(favoriterecipe__user=self.request.user)
+        if bool(value) and not self.request.user.is_anonymous:
+            return queryset.filter(
+                favoriterecipe__user=self.request.user
+            )
         return queryset.exclude(favoriterecipe__user=self.request.user)
 
     def get_is_in_shopping_cart(self, queryset, name, value):
-        if value:
+        if bool(value) and not self.request.user.is_anonymous:
             return queryset.filter(shoppingcartrecipe__user=self.request.user)
         return queryset.exclude(shoppingcartrecipe__user=self.request.user)
