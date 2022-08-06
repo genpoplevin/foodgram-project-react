@@ -34,13 +34,24 @@ class IngredientSerializer(serializers.ModelSerializer):
         model = Ingredient
         fields = ('id', 'name', 'measurement_unit')
 
+    def create(self, validated_data):
+        return Ingredient.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.measurement_unit = validated_data.get(
+            'measurement_unit',
+            instance.measurement_unit
+        )
+        instance.save()
+        return instance
+
 
 class IngredientsInRecipeSerializer(serializers.ModelSerializer):
-    id = serializers.ReadOnlyField(source='ingredient.id')
-    name = serializers.ReadOnlyField(source='ingredient.name')
-    measurement_unit = serializers.ReadOnlyField(
-        source='ingredient.measurement_unit'
-    )
+    id = IngredientSerializer()
+    name = serializers.CharField(required=False)
+    measurement_unit = serializers.CharField(required=False)
+    amount = serializers.IntegerField()
 
     class Meta:
         model = IngredientsInRecipe
