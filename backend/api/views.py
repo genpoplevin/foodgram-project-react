@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from api.serializers import (FavoriteCartSerializer, IngredientSerializer,
                              RecipeSerializer, SubscribeSerializer,
                              TagSerializer, UserSerializer)
-from api.utils.filters import IngredientFilter, TagFilter
+from api.utils.filters import IngredientFilter
 from api.utils.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from users.models import Subscribe, User
 
@@ -91,8 +91,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
     additional_serializer = FavoriteCartSerializer
-    filter_backends = (DjangoFilterBackend,)
-    filterset_class = TagFilter
+    # filter_backends = (DjangoFilterBackend,)
+    # filterset_class = TagFilter
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
