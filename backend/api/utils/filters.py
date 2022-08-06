@@ -34,9 +34,9 @@ class TagFilter(FilterSet):
             return queryset.filter(
                 favorites__user=self.request.user
             )
-        return queryset.exclude(favorites__user=self.request.user)
+        return queryset
 
     def get_is_in_shopping_cart(self, queryset, name, value):
         if bool(value) and not self.request.user.is_anonymous:
             return queryset.filter(shopping_cart__user=self.request.user)
-        return queryset.exclude(shopping_cart__user=self.request.user)
+        return queryset
