@@ -48,10 +48,6 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class IngredientsInRecipeSerializer(serializers.ModelSerializer):
-    id = IngredientSerializer()
-    name = serializers.CharField(required=False)
-    measurement_unit = serializers.CharField(required=False)
-    amount = serializers.IntegerField()
 
     class Meta:
         model = IngredientsInRecipe
