@@ -152,7 +152,6 @@ class ShoppingCart(models.Model):
     )
 
     class Meta:
-        ordering = ['name']
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Списки покупок'
         constraints = [
