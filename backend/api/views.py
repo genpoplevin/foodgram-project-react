@@ -103,8 +103,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def favorite(self, request, **kwargs):
         recipe = get_object_or_404(Recipe, id=kwargs.get('pk'))
         if request.method == 'POST':
-            if Favorite.objects.filter(user=request.user,
-                                       recipe_id=kwargs.get('pk')):
+            if Favorite.objects.filter(
+                user=request.user,
+                recipe_id=kwargs.get('pk')
+            ).exists():
                 return Response(
                     {'errors': 'Этот рецепт уже находится в вашем избранном'},
                     status=status.HTTP_400_BAD_REQUEST
