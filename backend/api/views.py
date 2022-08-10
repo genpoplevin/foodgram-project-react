@@ -120,7 +120,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'DELETE':
             favorite = Favorite.objects.filter(user=request.user,
                                                recipe_id=kwargs.get('pk'))
-            if not favorite:
+            if not favorite.exists():
                 return Response(
                     {'errors': 'В вашем избранном нет такого рецепта'},
                     status=status.HTTP_400_BAD_REQUEST
@@ -133,8 +133,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def shopping_cart(self, request, **kwargs):
         recipe = get_object_or_404(Recipe, id=kwargs.get('pk'))
         if request.method == 'POST':
-            if ShoppingCart.objects.filter(user=request.user,
-                                           recipe_id=kwargs.get('pk')):
+            if ShoppingCart.objects.filter(
+                user=request.user,
+                recipe_id=kwargs.get('pk')
+            ).exists():
                 return Response(
                     {
                         'errors': ('Этот рецепт уже находится'
@@ -153,7 +155,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 user=request.user,
                 recipe_id=kwargs.get('pk')
             )
-            if not shopping_cart:
+            if not shopping_cart.exists():
                 return Response(
                     {'errors': 'В вашем списке покупок нет такого рецепта'},
                     status=status.HTTP_400_BAD_REQUEST
