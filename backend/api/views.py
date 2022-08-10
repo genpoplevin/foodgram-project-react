@@ -101,18 +101,63 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['POST', 'DELETE'],
             permission_classes=(IsOwnerOrReadOnly,))
     def favorite(self, request, **kwargs):
+        recipe = get_object_or_404(Recipe, id=kwargs.get('pk'))
         if request.method == 'POST':
-            return self.add_recipe(Favorite, request, kwargs.get('pk'))
+            if Favorite.objects.filter(user=request.user,
+                                       recipe_id=kwargs.get('pk')):
+                return Response(
+                    {'errors': 'Этот рецепт уже находится в вашем избранном'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            favorite = Favorite.objects.create(user=request.user,
+                                               recipe=recipe)
+            serializer = self.additional_serializer(
+                favorite, context={'request': request}
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         if request.method == 'DELETE':
-            return self.delete_recipe(Favorite, request, kwargs.get('pk'))
+            favorite = Favorite.objects.filter(user=request.user,
+                                               recipe_id=kwargs.get('pk'))
+            if not favorite:
+                return Response(
+                    {'errors': 'В вашем избранном нет такого рецепта'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            favorite.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=['GET', 'POST', 'DELETE'],
             permission_classes=(IsAuthenticated,))
     def shopping_cart(self, request, **kwargs):
+        recipe = get_object_or_404(Recipe, id=kwargs.get('pk'))
         if request.method == 'POST':
-            return self.add_recipe(ShoppingCart, request, kwargs.get('pk'))
+            if ShoppingCart.objects.filter(user=request.user,
+                                           recipe_id=kwargs.get('pk')):
+                return Response(
+                    {
+                        'errors': ('Этот рецепт уже находится'
+                                   'в списке покупок')
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            shopping_cart = ShoppingCart.objects.create(user=request.user,
+                                                        recipe=recipe)
+            serializer = self.additional_serializer(
+                shopping_cart, context={'request': request}
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         if request.method == 'DELETE':
-            return self.delete_recipe(ShoppingCart, request, kwargs.get('pk'))
+            shopping_cart = ShoppingCart.objects.filter(
+                user=request.user,
+                recipe_id=kwargs.get('pk')
+            )
+            if not shopping_cart:
+                return Response(
+                    {'errors': 'В вашем списке покупок нет такого рецепта'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            shopping_cart.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
         methods=['GET'],
@@ -127,17 +172,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'ingredient__name',
             'amount',
             'ingredient__measurement_unit'
-        ).order_by(
-            'ingredient__name'
         )
         filename = f'{user.username}_shopping_list.txt'
         shopping_dict = {}
         for ingredient in ingredients:
             name = ingredient[0]
-            shopping_dict[name] = {
-                'amount': ingredient[1],
-                'measurement_unit': ingredient[2]
-            }
+            if name not in shopping_dict:
+                shopping_dict[name] = {
+                    'amount': ingredient[1],
+                    'measurement_unit': ingredient[2]
+                }
+            else:
+                shopping_dict[name]['amount'] += ingredient[1]
             shopping_list = []
             for key, value in shopping_dict.items():
                 shopping_list.append(f'{key} - {value["amount"]} '
@@ -149,23 +195,3 @@ class RecipeViewSet(viewsets.ModelViewSet):
             f'attachment; filename={filename}.txt'
         )
         return response
-
-    def add_recipe(self, model, request, pk):
-        recipe = get_object_or_404(Recipe, id=pk)
-        if model.objects.filter(recipe=recipe, user=request.user).exists():
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        model.objects.create(recipe=recipe, user=request.user)
-        serializer = self.additional_serializer(recipe)
-        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-
-    def delete_recipe(self, model, request, pk):
-        recipe = get_object_or_404(Recipe, id=pk)
-        if model.objects.filter(
-            user=request.user,
-            recipe=recipe
-        ).exists():
-            model.objects.filter(
-                user=request.user, recipe=recipe
-            ).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
