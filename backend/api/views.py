@@ -137,9 +137,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         for ingredient in ingredients:
             shopping_list += (
-                f'{ingredient["name"]}: '
+                f'{ingredient[0]}: '
                 f'{ingredient["ingredient_sum"]} '
-                f'{ingredient["measurement_unit"]}\n'
+                f'{ingredient[1]}\n'
             )
         response = HttpResponse(
             shopping_list, content_type='text.txt; charset=utf-8'
