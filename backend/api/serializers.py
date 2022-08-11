@@ -26,6 +26,16 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = '__all__'
 
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.color = validated_data.get('color', instance.color)
+        instance.slug = validated_data.get('slug', instance.slug)
+        instance.save()
+        return instance
+
+    def to_internal_value(self, data):
+        return Tag.objects.get(id=data)
+
 
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
