@@ -90,6 +90,21 @@ class RecipeSerializer(serializers.ModelSerializer):
                   'is_in_shopping_cart', 'name', 'image', 'text',
                   'cooking_time')
 
+    def get_is_favorited(self, obj):
+        user = self.context.get('request').user
+        if not user.is_authenticated:
+            return False
+        return Recipe.objects.filter(favorites__user=user, id=obj.id).exists()
+
+    def get_is_in_shopping_cart(self, obj):
+        user = self.context.get('request').user
+        if not user.is_authenticated:
+            return False
+        return Recipe.objects.filter(
+            shopping_cart__user=user,
+            id=obj.id
+        ).exists()
+
     def ingredint_in_recipe_bulk_create(self, ingredients, recipe):
         ingredients_in_recipe = [
             IngredientsInRecipe(
@@ -99,20 +114,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             ) for ingredient in ingredients
         ]
         IngredientsInRecipe.objects.bulk_create(ingredients_in_recipe)
-
-    def get_is_favorited(self, obj):
-        request = self.context['request']
-        if request is None or request.user.is_anonymous:
-            return False
-        return Favorite.objects.filter(
-            user=request.user, recipe=obj).exists()
-
-    def get_is_in_shopping_cart(self, obj):
-        request = self.context.get('request')
-        if request.user.is_anonymous:
-            return False
-        return ShoppingCart.objects.filter(
-            user=request.user, recipe=obj).exists()
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredientsinrecipe_set')
