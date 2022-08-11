@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserSerializer as DjoserUserSerializer
 from drf_extra_fields.fields import Base64ImageField
-from recipes.models import Favorite, Ingredient, IngredientsInRecipe, Recipe, ShoppingCart, Tag
+from recipes.models import Ingredient, IngredientsInRecipe, Recipe, Tag
 from rest_framework import serializers
 from users.models import Subscribe, User
 
@@ -154,7 +154,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
         self.ingredients_create(
-            ingredients=ingredients, recipe=recipe)
+            ingredients=ingredients,
+            recipe=recipe
+        )
         return recipe
 
     def update(self, instance, validated_data):
@@ -164,7 +166,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.tags.set(tags)
         Recipe.objects.filter(pk=instance.pk).update(**validated_data)
         self.ingredients_create(
-            ingredients=ingredients, recipe=instance)
+            ingredients=ingredients,
+            recipe=instance
+        )
         instance.refresh_from_db()
         return super().update(instance=instance, validated_data=validated_data)
 
@@ -185,7 +189,7 @@ class SubscribeSerializer(UserSerializer):
     first_name = serializers.ReadOnlyField(source='author.first_name')
     last_name = serializers.ReadOnlyField(source='author.last_name')
     is_subscribed = serializers.SerializerMethodField()
-    recipes = serializers.SerializerMethodField()
+    recipes = RecipeSubscribesSerializer(many=True)
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -197,10 +201,6 @@ class SubscribeSerializer(UserSerializer):
         return Subscribe.objects.filter(
             user=obj.user, author=obj.author
         ).exists()
-
-    def get_recipes(self, obj):
-        queryset = Recipe.objects.filter(author=obj.author)
-        return RecipeSubscribesSerializer(queryset, many=True).data
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj.author).count()
