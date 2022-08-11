@@ -105,7 +105,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             id=obj.id
         ).exists()
 
-    def ingredints_create(self, ingredients, recipe):
+    def ingredients_create(self, ingredients, recipe):
         ingredients_list = [
             IngredientsInRecipe(
                 ingredient=ingredient['id'],
@@ -153,10 +153,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
-        self.ingredints_create(
+        self.ingredients_create(
             ingredients=ingredients, recipe=recipe)
         return recipe
-
 
     def update(self, instance, validated_data):
         IngredientsInRecipe.objects.filter(recipe=instance).delete()
@@ -164,11 +163,10 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredients = validated_data.pop('ingredientsinrecipe_set')
         instance.tags.set(tags)
         Recipe.objects.filter(pk=instance.pk).update(**validated_data)
-        self.ingredints_create(
+        self.ingredients_create(
             ingredients=ingredients, recipe=instance)
         instance.refresh_from_db()
         return super().update(instance=instance, validated_data=validated_data)
-
 
 
 class RecipeSubscribesSerializer(serializers.ModelSerializer):
