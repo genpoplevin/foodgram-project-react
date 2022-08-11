@@ -33,17 +33,11 @@ class TagSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-    def to_internal_value(self, data):
-        return Tag.objects.get(id=data)
-
 
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
-        fields = ('id', 'name', 'measurement_unit')
-
-    def create(self, validated_data):
-        return Ingredient.objects.create(**validated_data)
+        fields = '__all__'
 
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
@@ -53,9 +47,6 @@ class IngredientSerializer(serializers.ModelSerializer):
         )
         instance.save()
         return instance
-
-    def to_internal_value(self, data):
-        return get_object_or_404(Ingredient, id=data)
 
 
 class IngredientsInRecipeSerializer(serializers.ModelSerializer):
