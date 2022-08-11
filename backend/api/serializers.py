@@ -97,17 +97,13 @@ class RecipeSerializer(serializers.ModelSerializer):
                 {'errors': 'Добавьте хотя бы один ингридиент в рецепт'})
         validated_ingredients = []
         for ingredient in ingredients:
-            current_ingredient = get_object_or_404(
-                Ingredient,
-                id=ingredient['id']
-            )
             amount = ingredient['amount']
             if int(ingredient['amount']) <= 0:
                 raise serializers.ValidationError(
                     {'errors': 'Количество ингридиента должно быть больше 0'}
                 )
             validated_ingredients.append(
-                {'ingredient': current_ingredient, 'amount': amount})
+                {'ingredient': ingredient, 'amount': amount})
         data['ingredients'] = validated_ingredients
         return data
 
