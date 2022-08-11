@@ -93,7 +93,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         #             'Такого тега не существует'
         # 
         print(data)
-        ingredients = self.initial_data.get('ingredients')
+        ingredients = data.get('ingredientsinrecipe_set')
         if not ingredients:
             raise serializers.ValidationError(
                 {'errors': 'Добавьте хотя бы один ингридиент в рецепт'})
