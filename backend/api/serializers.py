@@ -35,15 +35,6 @@ class IngredientSerializer(serializers.ModelSerializer):
         model = Ingredient
         fields = ('id', 'name', 'measurement_unit')
 
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get('name', instance.name)
-        instance.measurement_unit = validated_data.get(
-            'measurement_unit',
-            instance.measurement_unit
-        )
-        instance.save()
-        return instance
-
     def to_internal_value(self, data):
         return get_object_or_404(Ingredient, id=data)
 
