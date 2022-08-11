@@ -104,7 +104,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             return self.add_recipe(Favorite, request, kwargs.get('pk'))
         if request.method == 'DELETE':
-            return self.delete_recipe(Favorite(), request, kwargs.get('pk'))
+            return self.delete_recipe(Favorite, request, kwargs.get('pk'))
 
     @action(detail=True, methods=['GET', 'POST', 'DELETE'],
             permission_classes=(IsAuthenticated,))
