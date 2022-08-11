@@ -65,6 +65,16 @@ class RecipeSerializer(serializers.ModelSerializer):
         fields = ('id', 'tags', 'author', 'ingredients', 'is_favorited',
                   'is_in_shopping_cart', 'name', 'image', 'text',
                   'cooking_time')
+    
+    def ingredint_in_recipe_bulk_create(self, ingredients, recipe):
+        ingredients_in_recipe = [
+            IngredientsInRecipe(
+                ingredient=ingredient['id'],
+                recipe=recipe,
+                amount=ingredient['amount']
+            ) for ingredient in ingredients
+        ]
+        IngredientsInRecipe.objects.bulk_create(ingredients_in_recipe)
 
     def get_is_favorited(self, obj):
         user = self.context.get('request').user
@@ -109,17 +119,11 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredientsinrecipe_set')
+        tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
-        ingredients.set()
-        for ingredient in ingredients:
-            current_ingredient = ingredient['ingredient']
-            IngredientsInRecipe.objects.get_or_create(
-                ingredient=current_ingredient,
-                recipe=recipe,
-                amount=ingredient['amount']
-            )
-        tags = self.initial_data.get('tags')
         recipe.tags.set(tags)
+        self.ingredint_in_recipe_bulk_create(
+            ingredients=ingredients, recipe=recipe)
         return recipe
 
     def update(self, instance, validated_data):
