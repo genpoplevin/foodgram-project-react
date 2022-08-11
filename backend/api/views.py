@@ -127,7 +127,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'ingredient__name',
             'amount',
             'ingredient__measurement_unit'
-        )
+        ).order_by('ingredient__name')
         filename = f'{user.username}_shopping_list.txt'
         shopping_dict = {}
         for ingredient in ingredients:
