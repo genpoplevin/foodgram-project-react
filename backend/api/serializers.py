@@ -116,32 +116,38 @@ class RecipeSerializer(serializers.ModelSerializer):
         IngredientsInRecipe.objects.bulk_create(ingredients_list)
 
     def validate(self, data):
-
-        if 'ingredientsinrecipe' in data:
-            ingredients = data.get('ingredientsinrecipe_set')
-            if not ingredients:
+        ingredients = data.get('ingredientsinrecipe_set')
+        if not ingredients:
+            raise serializers.ValidationError(
+                {'errors': 'Добавьте хотя бы один ингредиент в рецепт'}
+            )
+        validated_ingredients = []
+        for ingredient in ingredients:
+            current_ingredient = get_object_or_404(
+                Ingredient,
+                id=ingredient['id']
+            )
+            amount = ingredient['amount']
+            if amount <= 0:
                 raise serializers.ValidationError(
-                    {'errors': 'Добавьте хотя бы один ингредиент в рецепт'}
+                    {
+                        'errors': ('Количество ингридиента должно быть '
+                                    'больше 0')
+                    }
                 )
-            validated_ingredients = []
-            for ingredient in ingredients:
-                current_ingredient = get_object_or_404(
-                    Ingredient,
-                    id=ingredient['id']
-                )
-                amount = ingredient['amount']
-                if amount <= 0:
-                    raise serializers.ValidationError(
-                        {
-                            'errors': ('Количество ингридиента должно быть '
-                                       'больше 0')
-                        }
-                    )
-                validated_ingredients.append(current_ingredient)
-            if len(validated_ingredients) != len(ingredients):
+            validated_ingredients.append(current_ingredient)
+        if len(validated_ingredients) != len(ingredients):
+            raise serializers.ValidationError(
+                'Ингридиенты должны быть уникальными.'
+            )
+        tags = data['tags']
+        if not tags:
+            raise serializers.ValidationError(
+                'У рецепта должен быть хотя бы один тег')
+        for tag in tags:
+            if not Tag.objects.filter(name=tag).exists():
                 raise serializers.ValidationError(
-                    'Ингридиенты должны быть уникальными.'
-                )
+                    'Такого тега нет в базе')
         return data
 
     def create(self, validated_data):
