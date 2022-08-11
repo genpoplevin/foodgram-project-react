@@ -131,7 +131,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ).order_by(
             'ingredient__name'
         ).annotate(
-            ingredient_sum=Sum('amount')
+            ingredient_sum=Sum('ingredient__amount')
         )
         filename = f'{user.username}_shopping_list.txt'
         shopping_dict = {}
