@@ -61,7 +61,7 @@ class IngredientSerializer(serializers.ModelSerializer):
         return get_object_or_404(Ingredient, id=data)
 
 
-class IngredientsInRecipeSerializer(serializers.ModelSerializer):
+class IngredientInRecipeSerializer(serializers.ModelSerializer):
     id = IngredientSerializer()
     name = serializers.CharField(required=False)
     measurement_unit = serializers.CharField(required=False)
@@ -79,9 +79,9 @@ class IngredientsInRecipeSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
-    tags = TagSerializer(read_only=True, many=True)
+    tags = TagSerializer(many=True)
     author = UserSerializer(read_only=True)
-    ingredients = IngredientsInRecipeSerializer(
+    ingredients = IngredientInRecipeSerializer(
         source='ingredientsinrecipe_set',
         many=True
     )
