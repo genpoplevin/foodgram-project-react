@@ -35,18 +35,6 @@ class IngredientSerializer(serializers.ModelSerializer):
         model = Ingredient
         fields = ('id', 'name', 'measurement_unit')
 
-    def create(self, validated_data):
-        return Ingredient.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get('name', instance.name)
-        instance.measurement_unit = validated_data.get(
-            'measurement_unit',
-            instance.measurement_unit
-        )
-        instance.save()
-        return instance
-
 
 class IngredientsInRecipeSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
