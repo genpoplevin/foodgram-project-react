@@ -81,7 +81,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     author = UserSerializer(read_only=True)
     ingredients = IngredientInRecipeSerializer(
-        source='ingredientsinrecipe',
+        source='ingredientsinrecipe_set',
         many=True
     )
     is_favorited = serializers.SerializerMethodField(
@@ -132,7 +132,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             user=request.user, recipe=obj).exists()
 
     def create(self, validated_data):
-        ingredients = validated_data.pop('ingredientsinrecipe')
+        ingredients = validated_data.pop('ingredientsinrecipe_set')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
@@ -144,7 +144,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         IngredientsInRecipe.objects.filter(recipe=instance).delete()
         tags = validated_data.pop('tags')
-        ingredients = validated_data.pop('ingredientsinrecipe')
+        ingredients = validated_data.pop('ingredientsinrecipe_set')
         instance.tags.set(tags)
         Recipe.objects.filter(pk=instance.pk).update(**validated_data)
 
@@ -164,7 +164,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 'Не переданы ингредиенты.'
             )
         if 'ingredientsinrecipe' in data:
-            ingredients = data.get('ingredientsinrecipe')
+            ingredients = data.get('ingredientsinrecipe_set')
             uniq_ingredients = set()
             for ingredient in ingredients:
                 id = ingredient['id']
