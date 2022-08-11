@@ -54,7 +54,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(read_only=True, many=True)
     author = UserSerializer(read_only=True)
     ingredients = IngredientsInRecipeSerializer(
-        source='ingredientsinrecipe_set',
+        source='ingredientsinrecipe',
         many=True
     )
     is_favorited = serializers.SerializerMethodField()
@@ -91,7 +91,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         #         raise serializers.ValidationError(
         #             'Такого тега не существует'
         #
-        ingredients = data.get('ingredientsinrecipe_set')
+        ingredients = data.get('ingredientsinrecipe')
         if not ingredients:
             raise serializers.ValidationError(
                 {'errors': 'Добавьте хотя бы один ингридиент в рецепт'})
