@@ -119,24 +119,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             id=obj.id
         ).exists()
 
-    def validate(self, data):
-        ingredients = data.get('ingredientsinrecipe_set')
-        uniq_ingredients = set()
-        for ingredient in ingredients:
-            id = ingredient['id']
-            amount = ingredient['amount']
-            if amount <= 0:
-                raise serializers.ValidationError(
-                    'Минимальное количество ингредиента: 1'
-                )
-            uniq_ingredients.add(id)
-
-        if len(uniq_ingredients) != len(ingredients):
-            raise serializers.ValidationError(
-                'Ингридиенты должны быть уникальными.'
-            )
-        return data
-
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredientsinrecipe_set')
         recipe = Recipe.objects.create(**validated_data)
@@ -158,6 +140,24 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         instance.refresh_from_db()
         return super().update(instance=instance, validated_data=validated_data)
+
+    def validate(self, data):
+        ingredients = data.get('ingredientsinrecipe_set')
+        uniq_ingredients = set()
+        for ingredient in ingredients:
+            id = ingredient['id']
+            amount = ingredient['amount']
+            if amount <= 0:
+                raise serializers.ValidationError(
+                    'Минимальное количество ингредиента: 1'
+                )
+            uniq_ingredients.add(id)
+
+        if len(uniq_ingredients) != len(ingredients):
+            raise serializers.ValidationError(
+                'Ингридиенты должны быть уникальными.'
+            )
+        return data
 
 
 class RecipeSubscribesSerializer(serializers.ModelSerializer):
