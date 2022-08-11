@@ -1,3 +1,4 @@
+from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -127,18 +128,19 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'ingredient__name',
             'amount',
             'ingredient__measurement_unit'
-        ).order_by('ingredient__name')
+        ).order_by(
+            'ingredient__name'
+        ).annotate(
+            ingredient_sum=Sum('amount')
+        )
         filename = f'{user.username}_shopping_list.txt'
         shopping_dict = {}
         for ingredient in ingredients:
             name = ingredient[0]
-            if name not in shopping_dict:
-                shopping_dict[name] = {
-                    'amount': ingredient[1],
-                    'measurement_unit': ingredient[2]
-                }
-            else:
-                shopping_dict[name]['amount'] += ingredient[1]
+            shopping_dict[name] = {
+                'amount': ingredient[1],
+                'measurement_unit': ingredient[2]
+            }
             shopping_list = []
             for key, value in shopping_dict.items():
                 shopping_list.append(f'{key} - {value["amount"]} '
