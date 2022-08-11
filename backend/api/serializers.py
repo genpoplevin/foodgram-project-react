@@ -105,38 +105,24 @@ class RecipeSerializer(serializers.ModelSerializer):
             id=obj.id
         ).exists()
 
-    def ingredint_in_recipe_bulk_create(self, ingredients, recipe):
-        ingredients_in_recipe = [
+    def ingredints_create(self, ingredients, recipe):
+        ingredients_list = [
             IngredientsInRecipe(
                 ingredient=ingredient['id'],
                 recipe=recipe,
                 amount=ingredient['amount']
             ) for ingredient in ingredients
         ]
-        IngredientsInRecipe.objects.bulk_create(ingredients_in_recipe)
+        IngredientsInRecipe.objects.bulk_create(ingredients_list)
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredientsinrecipe_set')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
-
-        self.ingredint_in_recipe_bulk_create(
+        self.ingredints_create(
             ingredients=ingredients, recipe=recipe)
         return recipe
-
-    def update(self, instance, validated_data):
-        IngredientsInRecipe.objects.filter(recipe=instance).delete()
-        tags = validated_data.pop('tags')
-        ingredients = validated_data.pop('ingredientsinrecipe_set')
-        instance.tags.set(tags)
-        Recipe.objects.filter(pk=instance.pk).update(**validated_data)
-
-        self.ingredint_in_recipe_bulk_create(
-            ingredients=ingredients, recipe=instance)
-
-        instance.refresh_from_db()
-        return super().update(instance=instance, validated_data=validated_data)
 
     def validate(self, data):
         if not data:
@@ -164,6 +150,18 @@ class RecipeSerializer(serializers.ModelSerializer):
                     'Ингридиенты должны быть уникальными.'
                 )
         return data
+
+    def update(self, instance, validated_data):
+        IngredientsInRecipe.objects.filter(recipe=instance).delete()
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredientsinrecipe_set')
+        instance.tags.set(tags)
+        Recipe.objects.filter(pk=instance.pk).update(**validated_data)
+        self.ingredints_create(
+            ingredients=ingredients, recipe=instance)
+        instance.refresh_from_db()
+        return super().update(instance=instance, validated_data=validated_data)
+
 
 
 class RecipeSubscribesSerializer(serializers.ModelSerializer):
