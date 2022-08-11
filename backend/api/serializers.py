@@ -61,7 +61,7 @@ class IngredientSerializer(serializers.ModelSerializer):
         return get_object_or_404(Ingredient, id=data)
 
 
-class IngredientInRecipeSerializer(serializers.ModelSerializer):
+class IngredientsInRecipeSerializer(serializers.ModelSerializer):
     id = IngredientSerializer()
     name = serializers.CharField(required=False)
     measurement_unit = serializers.CharField(required=False)
@@ -81,31 +81,18 @@ class RecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
     tags = TagSerializer(many=True)
     author = UserSerializer(read_only=True)
-    ingredients = IngredientInRecipeSerializer(
+    ingredients = IngredientsInRecipeSerializer(
         source='ingredientsinrecipe_set',
         many=True
     )
-    is_favorited = serializers.SerializerMethodField(
-        method_name='get_is_favorited'
-    )
-    is_in_shopping_cart = serializers.SerializerMethodField(
-        method_name='get_is_in_shopping_cart'
-    )
-    cooking_time = serializers.IntegerField()
+    is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
-        fields = ('id',
-                  'tags',
-                  'author',
-                  'ingredients',
-                  'is_favorited',
-                  'is_in_shopping_cart',
-                  'name',
-                  'image',
-                  'text',
-                  'cooking_time'
-                  )
+        fields = ('id', 'tags', 'author', 'ingredients', 'is_favorited',
+                  'is_in_shopping_cart', 'name', 'image', 'text',
+                  'cooking_time')
 
     def ingredint_in_recipe_bulk_create(self, ingredients, recipe):
         ingredients_in_recipe = [
