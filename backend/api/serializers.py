@@ -115,6 +115,35 @@ class RecipeSerializer(serializers.ModelSerializer):
         ]
         IngredientsInRecipe.objects.bulk_create(ingredients_list)
 
+    def validate(self, data):
+
+        if 'ingredientsinrecipe' in data:
+            ingredients = data.get('ingredientsinrecipe_set')
+            if not ingredients:
+                raise serializers.ValidationError(
+                    {'errors': 'Добавьте хотя бы один ингредиент в рецепт'}
+                )
+            validated_ingredients = []
+            for ingredient in ingredients:
+                current_ingredient = get_object_or_404(
+                    Ingredient,
+                    id=ingredient['id']
+                )
+                amount = ingredient['amount']
+                if amount <= 0:
+                    raise serializers.ValidationError(
+                        {
+                            'errors': ('Количество ингридиента должно быть '
+                                       'больше 0')
+                        }
+                    )
+                validated_ingredients.append(current_ingredient)
+            if len(validated_ingredients) != len(ingredients):
+                raise serializers.ValidationError(
+                    'Ингридиенты должны быть уникальными.'
+                )
+        return data
+
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredientsinrecipe_set')
         tags = validated_data.pop('tags')
@@ -124,32 +153,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             ingredients=ingredients, recipe=recipe)
         return recipe
 
-    def validate(self, data):
-        if not data:
-            raise serializers.ValidationError(
-                'Обязательное поле.'
-            )
-        if len(data) < 1:
-            raise serializers.ValidationError(
-                'Не переданы ингредиенты.'
-            )
-        if 'ingredientsinrecipe' in data:
-            ingredients = data.get('ingredientsinrecipe_set')
-            uniq_ingredients = set()
-            for ingredient in ingredients:
-                id = ingredient['id']
-                amount = ingredient['amount']
-                if amount <= 0:
-                    raise serializers.ValidationError(
-                        'Минимальное количество ингредиента: 1'
-                    )
-                uniq_ingredients.add(id)
-
-            if len(uniq_ingredients) != len(ingredients):
-                raise serializers.ValidationError(
-                    'Ингридиенты должны быть уникальными.'
-                )
-        return data
 
     def update(self, instance, validated_data):
         IngredientsInRecipe.objects.filter(recipe=instance).delete()
