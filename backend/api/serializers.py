@@ -50,7 +50,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class IngredientsInRecipeSerializer(serializers.ModelSerializer):
-    id = IngredientSerializer()
+    id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
     name = serializers.CharField(required=False)
     measurement_unit = serializers.CharField(required=False)
     amount = serializers.IntegerField()
