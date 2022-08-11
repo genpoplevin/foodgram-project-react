@@ -126,12 +126,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
             recipe__shopping_cart__user=request.user
         ).values_list(
             'ingredient__name',
-            'amount',
             'ingredient__measurement_unit'
         ).order_by(
             'ingredient__name'
         ).annotate(
-            ingredient_sum=Sum('ingredient__amount')
+            ingredient_sum=Sum('amount')
         )
         filename = f'{user.username}_shopping_list.txt'
         shopping_dict = {}
