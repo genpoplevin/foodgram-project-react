@@ -173,14 +173,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         return super().update(instance=instance, validated_data=validated_data)
 
 
-class ShortRecipeSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Recipe
-        fields = 'id', 'name', 'image', 'cooking_time'
-        read_only_fields = '__all__',
-
-
 class RecipeSubscribesSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
 
@@ -197,7 +189,7 @@ class SubscribeSerializer(UserSerializer):
     first_name = serializers.ReadOnlyField(source='author.first_name')
     last_name = serializers.ReadOnlyField(source='author.last_name')
     is_subscribed = serializers.SerializerMethodField()
-    recipes = ShortRecipeSerializer(many=True)
+    recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -209,6 +201,10 @@ class SubscribeSerializer(UserSerializer):
         return Subscribe.objects.filter(
             user=obj.user, author=obj.author
         ).exists()
+
+    def get_recipes(self, obj):
+        queryset = Recipe.objects.filter(author=obj.author)
+        return RecipeSubscribesSerializer(queryset, many=True).data
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj.author).count()
