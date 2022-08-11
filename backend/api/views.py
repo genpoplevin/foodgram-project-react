@@ -129,35 +129,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['GET', 'POST', 'DELETE'],
             permission_classes=(IsAuthenticated,))
     def shopping_cart(self, request, **kwargs):
-        recipe = get_object_or_404(Recipe, id=kwargs.get('pk'))
         if request.method == 'POST':
-            if ShoppingCart.objects.filter(user=request.user,
-                                           recipe_id=kwargs.get('pk')):
-                return Response(
-                    {
-                        'errors': ('Этот рецепт уже находится'
-                                   'в списке покупок')
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            shopping_cart = ShoppingCart.objects.create(user=request.user,
-                                                        recipe=recipe)
-            serializer = self.additional_serializer(
-                shopping_cart, context={'request': request}
-            )
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return self.add_recipe(ShoppingCart, request, kwargs.get('pk'))
         if request.method == 'DELETE':
-            shopping_cart = ShoppingCart.objects.filter(
-                user=request.user,
-                recipe_id=kwargs.get('pk')
-            )
-            if not shopping_cart:
-                return Response(
-                    {'errors': 'В вашем списке покупок нет такого рецепта'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            shopping_cart.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return self.delete_recipe(ShoppingCart, request, kwargs.get('pk'))
 
     @action(
         methods=['GET'],
@@ -195,3 +170,23 @@ class RecipeViewSet(viewsets.ModelViewSet):
             f'attachment; filename={filename}.txt'
         )
         return response
+
+    def add_recipe(self, model, request, pk):
+        recipe = get_object_or_404(Recipe, id=pk)
+        if model.objects.filter(recipe=recipe, user=request.user).exists():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        instance = model.objects.create(user=request.user, recipe=recipe)
+        serializer = FavoriteCartSerializer(instance,
+                                            context={'request': request})
+        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+
+    def delete_recipe(self, model, request, pk):
+        recipe = get_object_or_404(Recipe, id=pk)
+        if model.objects.filter(
+            user=request.user, recipe=recipe
+        ).exists():
+            model.objects.filter(
+                user=request.user, recipe=recipe
+            ).delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
