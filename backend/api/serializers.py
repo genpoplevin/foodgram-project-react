@@ -110,6 +110,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredientsinrecipe_set')
         recipe = Recipe.objects.create(**validated_data)
+        recipe.ingredients.set(ingredients)
         for ingredient in ingredients:
             current_ingredient = ingredient['ingredient']
             IngredientsInRecipe.objects.get_or_create(
