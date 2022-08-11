@@ -33,6 +33,9 @@ class TagSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+    def to_internal_value(self, data):
+        return Tag.objects.get(id=data)
+
 
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
@@ -50,7 +53,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class IngredientsInRecipeSerializer(serializers.ModelSerializer):
-    id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
+    id = IngredientSerializer()
     name = serializers.CharField(required=False)
     measurement_unit = serializers.CharField(required=False)
     amount = serializers.IntegerField()
