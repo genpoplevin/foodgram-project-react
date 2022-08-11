@@ -85,14 +85,27 @@ class RecipeSerializer(serializers.ModelSerializer):
         source='ingredientsinrecipe_set',
         many=True
     )
-    is_favorited = serializers.SerializerMethodField()
-    is_in_shopping_cart = serializers.SerializerMethodField()
+    is_favorited = serializers.SerializerMethodField(
+        method_name='get_is_favorited'
+    )
+    is_in_shopping_cart = serializers.SerializerMethodField(
+        method_name='get_is_in_shopping_cart'
+    )
+    cooking_time = serializers.IntegerField()
 
     class Meta:
         model = Recipe
-        fields = ('id', 'tags', 'author', 'ingredients', 'is_favorited',
-                  'is_in_shopping_cart', 'name', 'image', 'text',
-                  'cooking_time')
+        fields = ('id',
+                  'tags',
+                  'author',
+                  'ingredients',
+                  'is_favorited',
+                  'is_in_shopping_cart',
+                  'name',
+                  'image',
+                  'text',
+                  'cooking_time'
+                  )
 
     def ingredint_in_recipe_bulk_create(self, ingredients, recipe):
         ingredients_in_recipe = [
