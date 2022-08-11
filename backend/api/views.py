@@ -125,22 +125,25 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ingredients = IngredientsInRecipe.objects.filter(
             recipe__shopping_cart__user=request.user
         ).values_list(
-            name='ingredients__name',
-            measurement_unit='ingredients__measurement_unit'
+            'ingredient__name',
+            'ingredient__measurement_unit'
         ).order_by(
             'ingredient__name'
         ).annotate(
             ingredient_sum=Sum('amount')
         )
         filename = f'{user.username}_shopping_list.txt'
-        shopping_list = ("Список покупок\n")
-
+        temp_shopping_list = {}
         for ingredient in ingredients:
-            shopping_list += (
-                f'{ingredient["name"]}: '
-                f'{ingredient["ingredient_sum"]} '
-                f'{ingredient["measurement_unit"]}\n'
-            )
+            name = ingredient[0]
+            temp_shopping_list[name] = {
+                'amount': ingredient[1],
+                'measurement_unit': ingredient[2]
+            }
+            shopping_list = []
+            for key, value in temp_shopping_list.items():
+                shopping_list.append(f'{key} - {value["amount"]} '
+                                     f'{value["measurement_unit"]}\n')
         response = HttpResponse(
             shopping_list, content_type='text.txt; charset=utf-8'
         )
