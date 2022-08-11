@@ -92,6 +92,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         #         raise serializers.ValidationError(
         #             'Такого тега не существует'
         #
+        print(data)
         ingredients = data['ingredients']
         ingredient_list = []
         for items in ingredients:
@@ -101,6 +102,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     'Ингредиент должен быть уникальным!')
             ingredient_list.append(ingredient)
+        return data
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
