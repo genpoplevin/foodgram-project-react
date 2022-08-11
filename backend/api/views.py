@@ -140,7 +140,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 'amount': ingredient[1],
                 'measurement_unit': ingredient[2]
             }
-            shopping_list = []
+            shopping_list = ["Список покупок\n"]
             for key, value in temp_shopping_list.items():
                 shopping_list.append(f'{key} - {value["amount"]} '
                                      f'{value["measurement_unit"]}\n')
