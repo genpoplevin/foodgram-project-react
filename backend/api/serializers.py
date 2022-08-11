@@ -23,21 +23,8 @@ class UserSerializer(DjoserUserSerializer):
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = ('id', 'name', 'color', 'slug')
         model = Tag
-
-    def create(self, validated_data):
-        return Tag.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get('name', instance.name)
-        instance.color = validated_data.get('color', instance.color)
-        instance.slug = validated_data.get('slug', instance.slug)
-        instance.save()
-        return instance
-
-    def to_internal_value(self, data):
-        return Tag.objects.get(id=data)
+        fields = '__all__'
 
 
 class IngredientSerializer(serializers.ModelSerializer):
