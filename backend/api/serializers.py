@@ -147,9 +147,9 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             validated_ingredients.append(id)
         if len(validated_ingredients) != len(ingredients):
             raise serializers.ValidationError(
-                'Ингридиенты должны быть уникальными.'
+                'Ингредиенты должны быть уникальными.'
             )
-        tags = self.initial_data['tags']
+        tags = data['tags']
         if not tags:
             raise serializers.ValidationError(
                 'В рецепте должен быть хотя бы один тег'
