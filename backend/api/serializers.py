@@ -216,7 +216,7 @@ class SubscribeSerializer(UserSerializer):
         ).exists()
 
     def get_recipes_count(self, obj):
-        return Recipe.objects.filter(author=obj.author).count()
+        return Recipe.objects.filter(author=obj.following).count()
 
 
 class FavoriteCartSerializer(serializers.ModelSerializer):
