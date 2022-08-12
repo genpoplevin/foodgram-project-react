@@ -149,7 +149,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Ингридиенты должны быть уникальными.'
             )
-        tags = data['tags']
+        tags = self.initial_data['tags']
         if not tags:
             raise serializers.ValidationError(
                 'В рецепте должен быть хотя бы один тег'
