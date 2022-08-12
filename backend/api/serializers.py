@@ -154,11 +154,13 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'В рецепте должен быть хотя бы один тег'
             )
+        validated_tags = []
         for tag in tags:
-            if not Tag.objects.filter(name=tag).exists():
-                raise serializers.ValidationError(
-                    'Такого тега нет в базе'
-                )
+            validated_tags.append(id)
+        if len(validated_tags) != len(validated_tags):
+            raise serializers.ValidationError(
+                'У одного рецепта может быть только один тег.'
+            )
         return data
 
     def create(self, validated_data):
