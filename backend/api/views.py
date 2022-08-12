@@ -10,8 +10,9 @@ from rest_framework.permissions import (AllowAny, IsAuthenticated,
 from rest_framework.response import Response
 
 from api.serializers import (FavoriteCartSerializer, IngredientSerializer,
-                             RecipeSerializer, SubscribeSerializer,
-                             TagSerializer, UserSerializer)
+                             RecipeCreateSerializer, RecipeReadSerializer,
+                             SubscribeSerializer, TagSerializer,
+                             UserSerializer)
 from api.utils.filters import IngredientFilter, TagFilter
 from api.utils.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from recipes.models import (Favorite, Ingredient, IngredientsInRecipe, Recipe,
@@ -90,11 +91,16 @@ class IngredientViewSet(viewsets.ModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    serializer_class = RecipeSerializer
+    serializer_class = RecipeCreateSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
     additional_serializer = FavoriteCartSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TagFilter
+
+    def get_serializer_class(self):
+        if self.request.method in ['POST', 'PATCH', 'PUT']:
+            return RecipeCreateSerializer
+        return RecipeReadSerializer
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
