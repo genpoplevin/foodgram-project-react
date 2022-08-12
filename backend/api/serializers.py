@@ -203,7 +203,7 @@ class SubscribeSerializer(UserSerializer):
     last_name = serializers.ReadOnlyField(source='author.last_name')
     is_subscribed = serializers.SerializerMethodField()
     recipes = RecipeSubscribesSerializer(many=True, source='author.recipes')
-    recipes_count = serializers.SerializerMethodField()
+    recipes_count = serializers.ReadOnlyField(source='author.recipes.count')
 
     class Meta:
         model = Subscribe
@@ -214,9 +214,6 @@ class SubscribeSerializer(UserSerializer):
         return Subscribe.objects.filter(
             user=obj.user, author=obj.author
         ).exists()
-
-    def get_recipes_count(self, obj):
-        return Recipe.objects.filter(author=obj.following).count()
 
 
 class FavoriteCartSerializer(serializers.ModelSerializer):
