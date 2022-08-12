@@ -26,9 +26,6 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = '__all__'
 
-    def to_internal_value(self, data):
-        return Tag.objects.get(id=data)
-
 
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
@@ -56,7 +53,10 @@ class IngredientsInRecipeSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
-    tags = TagSerializer(many=True)
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(),
+        many=True
+    )
     author = UserSerializer(read_only=True)
     ingredients = IngredientsInRecipeSerializer(
         source='ingredientsinrecipe_set',
