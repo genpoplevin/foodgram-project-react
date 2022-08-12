@@ -202,7 +202,7 @@ class SubscribeSerializer(UserSerializer):
     first_name = serializers.ReadOnlyField(source='author.first_name')
     last_name = serializers.ReadOnlyField(source='author.last_name')
     is_subscribed = serializers.SerializerMethodField()
-    recipes = RecipeSubscribesSerializer(many=True, source='author.recipes')
+    recipes = serializers.SerializerMethodField()
     recipes_count = serializers.ReadOnlyField(source='author.recipes.count')
 
     class Meta:
@@ -214,6 +214,14 @@ class SubscribeSerializer(UserSerializer):
         return Subscribe.objects.filter(
             user=obj.user, author=obj.author
         ).exists()
+
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        limit = request.GET.get('recipes_limit')
+        queryset = Recipe.objects.filter(author=obj.author)
+        if limit:
+            queryset = queryset[:int(limit)]
+        return CropRecipeSerializer(queryset, many=True).data
 
 
 class FavoriteCartSerializer(serializers.ModelSerializer):
