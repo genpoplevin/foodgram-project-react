@@ -157,7 +157,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         for tag in tags:
             if not Tag.objects.filter(name=tag).exists():
                 raise serializers.ValidationError(
-                    'Такого тега нет в базе'
+                    f'Такого тега нет в базе {tag}'
                 )
         return data
 
