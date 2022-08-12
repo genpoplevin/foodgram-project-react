@@ -136,12 +136,11 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             )
         validated_ingredients = []
         for ingredient in ingredients:
-            id = ingredient['id']
             amount = ingredient['amount']
             if amount <= 0:
                 raise serializers.ValidationError(
                     {
-                        'errors': ('Количество ингридиента должно быть '
+                        'errors': ('Количество ингредиента должно быть '
                                    'больше 0')
                     }
                 )
@@ -153,7 +152,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         tags = data['tags']
         if not tags:
             raise serializers.ValidationError(
-                'В рецепте должен быть хотя бы один тег')
+                'В рецепте должен быть хотя бы один тег'
+            )
         for tag in tags:
             if not Tag.objects.filter(name=tag).exists():
                 raise serializers.ValidationError(
