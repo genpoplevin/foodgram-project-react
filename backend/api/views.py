@@ -137,7 +137,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         for ingredient in ingredients:
             name = ingredient[0]
             temp_shopping_cart[name] = {
-                'amount': 'ingredient_sum',
+                'amount': ingredient,
                 'measurement_unit': ingredient[1]
             }
             shopping_cart = ["Список покупок\n\n"]
