@@ -1,8 +1,9 @@
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserSerializer as DjoserUserSerializer
 from drf_extra_fields.fields import Base64ImageField
-from recipes.models import Ingredient, IngredientsInRecipe, Recipe, Tag
 from rest_framework import serializers
+
+from recipes.models import Ingredient, IngredientsInRecipe, Recipe, Tag
 from users.models import Subscribe, User
 
 
@@ -26,17 +27,11 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = '__all__'
 
-    def to_internal_value(self, data):
-        return Tag.objects.get(id=data)
-
 
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
         fields = ('id', 'name', 'measurement_unit')
-
-    def to_internal_value(self, data):
-        return get_object_or_404(Ingredient, id=data)
 
 
 class IngredientsInRecipeSerializer(serializers.ModelSerializer):
