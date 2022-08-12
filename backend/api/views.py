@@ -133,19 +133,19 @@ class RecipeViewSet(viewsets.ModelViewSet):
             ingredient_sum=Sum('amount')
         )
         filename = f'{user.username}_shopping_list.txt'
-        temp_shopping_list = {}
+        temp_shopping_cart = {}
         for ingredient in ingredients:
             name = ingredient[0]
-            temp_shopping_list[name] = {
-                'amount': ingredient[2],
+            temp_shopping_cart[name] = {
+                'amount': ingredient['ingredient_sum'],
                 'measurement_unit': ingredient[1]
             }
-            shopping_list = ["Список покупок\n\n"]
-            for key, value in temp_shopping_list.items():
-                shopping_list.append(f'{key} - {value["amount"]} '
+            shopping_cart = ["Список покупок\n\n"]
+            for key, value in temp_shopping_cart.items():
+                shopping_cart.append(f'{key} - {value["amount"]} '
                                      f'{value["measurement_unit"]}\n')
         response = HttpResponse(
-            shopping_list, content_type='text.txt; charset=utf-8'
+            shopping_cart, content_type='text.txt; charset=utf-8'
         )
         response['Content-Disposition'] = (
             f'attachment; filename={filename}.txt'
