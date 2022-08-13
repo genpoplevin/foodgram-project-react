@@ -133,6 +133,10 @@ class IngredientsInRecipe(models.Model):
     class Meta:
         verbose_name = 'Количество ингредиентов'
         verbose_name_plural = 'Количество ингредиентов'
+        constraints = [
+            models.UniqueConstraint(fields=('ingredient', 'recipe'),
+                                    name='unique_ingredient_recipe')
+        ]
 
 
 class ShoppingCart(models.Model):

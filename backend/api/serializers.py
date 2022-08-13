@@ -144,7 +144,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                                    'больше 0')
                     }
                 )
-            validated_ingredients.append(id)
+            validated_ingredients.add(id)
         if len(validated_ingredients) != len(ingredients):
             raise serializers.ValidationError(
                 'Ингредиенты должны быть уникальными.'
