@@ -134,7 +134,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {'errors': 'Добавьте хотя бы один ингредиент в рецепт'}
             )
-        validated_ingredients = set()
+        validated_ingredients = []
         for ingredient in ingredients:
             amount = ingredient['amount']
             if amount <= 0:
@@ -144,11 +144,11 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                                    'больше 0')
                     }
                 )
-            validated_ingredients.add(id)
-        if len(validated_ingredients) != len(ingredients):
-            raise serializers.ValidationError(
-                'Ингредиенты должны быть уникальными.'
-            )
+            if ingredient in validated_ingredients:
+                raise serializers.ValidationError(
+                    'Ингредиенты должны быть уникальными.'
+                )
+            validated_ingredients.append(ingredient)
         tags = data['tags']
         if not tags:
             raise serializers.ValidationError(
