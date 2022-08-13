@@ -134,7 +134,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {'errors': 'Добавьте хотя бы один ингредиент в рецепт'}
             )
-        validated_ingredients = []
+        validated_ingredients = set()
         for ingredient in ingredients:
             amount = ingredient['amount']
             if amount <= 0:
